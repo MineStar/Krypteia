@@ -24,14 +24,14 @@ import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.entity.Player;
 
 import de.minestar.krypteia.core.KrypteiaCore;
-import de.minestar.krypteia.thread.ScanThread;
+import de.minestar.krypteia.thread.AnalyzeThread;
 import de.minestar.minestarlibrary.commands.AbstractCommand;
 import de.minestar.minestarlibrary.utils.ConsoleUtils;
 import de.minestar.minestarlibrary.utils.PlayerUtils;
 
-public class cmdScan extends AbstractCommand {
+public class cmdAnalyze extends AbstractCommand {
 
-    public cmdScan(String syntax, String arguments, String node) {
+    public cmdAnalyze(String syntax, String arguments, String node) {
         super(KrypteiaCore.NAME, syntax, arguments, node);
     }
 
@@ -52,18 +52,13 @@ public class cmdScan extends AbstractCommand {
             return;
         }
 
-        int size = 0;
-        try {
-            size = Integer.parseInt(args[1]);
-        } catch (Exception e) {
-            ConsoleUtils.printError(pluginName, args[1] + " ist keine Zahl!");
+        if (!KrypteiaCore.dbHandler.hasData(worldName)) {
+            ConsoleUtils.printError(pluginName, "Uber die Welt '" + worldName + "' liegen keine Daten vor!");
             return;
         }
 
-        ConsoleUtils.printInfo(pluginName, "Start scan");
+        ConsoleUtils.printInfo(pluginName, "Start analyze of world '" + worldName + "'!");
 
-        ScanThread thread = new ScanThread(world, size);
-        int id = Bukkit.getScheduler().scheduleSyncRepeatingTask(KrypteiaCore.INSTANCE, thread, 5L, 1L);
-        thread.setThreadId(id);
+        Bukkit.getScheduler().scheduleAsyncDelayedTask(KrypteiaCore.INSTANCE, new AnalyzeThread(world.getName().toLowerCase()));
     }
 }

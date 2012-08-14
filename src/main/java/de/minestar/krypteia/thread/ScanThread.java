@@ -65,7 +65,7 @@ public class ScanThread implements Runnable {
         startZ = startZ >> 4;
         endX = endX >> 4;
         endZ = endZ >> 4;
-        
+
         curX = startX;
 
         chunkCount = calculateSize(startX, startZ, endX, endZ);
@@ -79,6 +79,7 @@ public class ScanThread implements Runnable {
         } else
             scanWorld();
     }
+
     private final static NumberFormat FORMAT = DecimalFormat.getPercentInstance();
 
     private void scanWorld() {
@@ -91,7 +92,7 @@ public class ScanThread implements Runnable {
             if (chunk != null) {
                 snapShot = chunk.getChunkSnapshot();
                 if (snapShot != null)
-                    scanChunk(snapShot, world.getName());
+                    scanChunk(snapShot, world.getName().toLowerCase());
                 chunk.unload();
             }
 

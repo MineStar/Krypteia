@@ -4,6 +4,7 @@ import java.io.File;
 
 import org.bukkit.scheduler.BukkitScheduler;
 
+import de.minestar.krypteia.command.cmdAnalyze;
 import de.minestar.krypteia.command.cmdScan;
 import de.minestar.krypteia.database.DatabaseHandler;
 import de.minestar.krypteia.thread.BlockQueue;
@@ -17,8 +18,6 @@ public class KrypteiaCore extends AbstractCore {
     public static KrypteiaCore INSTANCE;
 
     public static DatabaseHandler dbHandler;
-
-//    private Listener blockListener;
 
     public static BlockQueue blockQueue;
 
@@ -41,28 +40,13 @@ public class KrypteiaCore extends AbstractCore {
         // @formatter:off
         this.cmdList = new CommandList(NAME,
                     
-                    new cmdScan("/scan", "<World> <Size>", "krypteia.command")
+                    new cmdScan(        "/scan",    "<World> <Size>",   "krypteia.command"),
+                    new cmdAnalyze(     "/analyze", "<World>",          "krypteia.command")
                 );
 
         // @formatter:on
         return true;
     }
-
-//    @Override
-//    protected boolean createListener() {
-//
-//        this.blockListener = new BlockListener();
-//
-//        return true;
-//    }
-//
-//    @Override
-//    protected boolean registerEvents(PluginManager pm) {
-//
-//        pm.registerEvents(blockListener, this);
-//
-//        return true;
-//    }
 
     @Override
     protected boolean createThreads() {

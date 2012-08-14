@@ -6,3 +6,6 @@ commands:
     scan:
         description: Scannt eine Welt
         usage: /scan
+    analyze:
+        description: Analysiert Daten einer Welt
+        analyze: /scan
