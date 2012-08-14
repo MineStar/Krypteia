@@ -21,6 +21,8 @@ package de.minestar.krypteia.thread;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Set;
 
 import org.bukkit.Bukkit;
@@ -52,6 +54,8 @@ public class ScanThread implements Runnable {
 
     private int threadId;
 
+    private List<Chunk> chunksToUnload = new LinkedList<Chunk>();
+
     public ScanThread(World world, int size) {
         this.world = world;
 
@@ -77,8 +81,17 @@ public class ScanThread implements Runnable {
             KrypteiaCore.blockQueue.finishQueue();
             Bukkit.getScheduler().cancelTask(threadId);
             ConsoleUtils.printInfo(KrypteiaCore.NAME, "Scan finished");
-        } else
+        } else {
+            unloadChunks();
             scanWorld();
+        }
+    }
+
+    private void unloadChunks() {
+        for (Chunk c : chunksToUnload)
+            c.unload(false, false);
+        
+        chunksToUnload.clear();
     }
 
     private final static NumberFormat FORMAT = DecimalFormat.getPercentInstance();
@@ -94,7 +107,7 @@ public class ScanThread implements Runnable {
                 snapShot = chunk.getChunkSnapshot();
                 if (snapShot != null)
                     scanChunk(snapShot, world.getName().toLowerCase());
-                chunk.unload();
+                chunksToUnload.add(chunk);
             }
 
             ++counter;

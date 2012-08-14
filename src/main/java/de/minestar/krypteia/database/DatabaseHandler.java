@@ -82,7 +82,9 @@ public class DatabaseHandler extends AbstractMySQLHandler {
                 queue.setInt(index++, block.getZ());
                 queue.setString(index++, block.getWorldName());
             }
-
+            tempQueue.clear();
+            tempQueue = null;
+            block = null;
             queue.executeUpdate();
         } catch (Exception e) {
             ConsoleUtils.printException(e, KrypteiaCore.NAME, "Can't flush queue to database!");

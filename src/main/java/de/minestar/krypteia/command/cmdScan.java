@@ -63,7 +63,7 @@ public class cmdScan extends AbstractCommand {
         ConsoleUtils.printInfo(pluginName, "Start scan");
 
         ScanThread thread = new ScanThread(world, size);
-        int id = Bukkit.getScheduler().scheduleSyncRepeatingTask(KrypteiaCore.INSTANCE, thread, 5L, 1L);
+        int id = Bukkit.getScheduler().scheduleSyncRepeatingTask(KrypteiaCore.INSTANCE, thread, 0L, 20L);
         thread.setThreadId(id);
     }
 }
