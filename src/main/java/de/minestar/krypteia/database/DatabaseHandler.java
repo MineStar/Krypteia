@@ -49,7 +49,7 @@ public class DatabaseHandler extends AbstractMySQLHandler {
     protected void createStatements(String pluginName, Connection con) throws Exception {
 
         hasData = con.prepareStatement("SELECT 1 FROM blocks WHERE world = ?");
-        getDataBlocks = con.prepareStatement("SELECT blockId, y, x, z FROM blocks WHERE world = ? ORDER BY blockId, y, x, z");
+        getDataBlocks = con.prepareStatement("SELECT blockId, x, y, z FROM blocks WHERE world = ? ORDER BY blockId, y, x, z");
     }
 
     public void flushQueue(String sqlString) {
