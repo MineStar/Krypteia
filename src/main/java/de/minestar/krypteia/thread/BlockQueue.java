@@ -18,6 +18,7 @@
 
 package de.minestar.krypteia.thread;
 
+import java.util.LinkedList;
 import java.util.Queue;
 import java.util.concurrent.LinkedBlockingDeque;
 
@@ -26,7 +27,7 @@ import de.minestar.krypteia.data.QueuedBlock;
 
 public class BlockQueue implements Runnable {
 
-    public final static int QUEUE_SIZE = 64;
+    public final static int QUEUE_SIZE = 256;
 
     private Queue<QueuedBlock> queue = new LinkedBlockingDeque<QueuedBlock>();
 
@@ -42,8 +43,18 @@ public class BlockQueue implements Runnable {
     }
 
     public void flushQueue() {
+        if (!queue.isEmpty()) {
+            Queue<QueuedBlock> tempQueue = new LinkedList<QueuedBlock>();
+            for (int i = 0; i < QUEUE_SIZE; ++i)
+                tempQueue.offer(queue.poll());
+
+            KrypteiaCore.dbHandler.flushQueue(tempQueue);
+        }
+    }
+
+    public void finishQueue() {
         if (!queue.isEmpty())
-            KrypteiaCore.dbHandler.flushQueue(createQueueStatement());
+            KrypteiaCore.dbHandler.finishQueue(createQueueStatement());
     }
 
     private String createQueueStatement() {

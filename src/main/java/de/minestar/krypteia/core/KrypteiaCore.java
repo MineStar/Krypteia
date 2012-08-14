@@ -57,7 +57,7 @@ public class KrypteiaCore extends AbstractCore {
 
     @Override
     protected boolean commonDisable() {
-        blockQueue.flushQueue();
+        blockQueue.finishQueue();
         dbHandler.closeConnection();
         return dbHandler != null && !dbHandler.hasConnection();
     }

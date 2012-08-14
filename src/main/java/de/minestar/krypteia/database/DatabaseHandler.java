@@ -24,9 +24,12 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.Queue;
 
 import de.minestar.krypteia.core.KrypteiaCore;
 import de.minestar.krypteia.data.DataBlock;
+import de.minestar.krypteia.data.QueuedBlock;
+import de.minestar.krypteia.thread.BlockQueue;
 import de.minestar.minestarlibrary.database.AbstractMySQLHandler;
 import de.minestar.minestarlibrary.database.DatabaseUtils;
 import de.minestar.minestarlibrary.utils.ConsoleUtils;
@@ -35,6 +38,7 @@ public class DatabaseHandler extends AbstractMySQLHandler {
 
     private PreparedStatement hasData;
     private PreparedStatement getDataBlocks;
+    private PreparedStatement queue;
 
     public DatabaseHandler(String pluginName, File SQLConfigFile) {
         super(pluginName, SQLConfigFile);
@@ -50,13 +54,36 @@ public class DatabaseHandler extends AbstractMySQLHandler {
 
         hasData = con.prepareStatement("SELECT 1 FROM blocks WHERE world = ?");
         getDataBlocks = con.prepareStatement("SELECT blockId, x, y, z FROM blocks WHERE world = ? ORDER BY blockId, y, x, z");
+
+        createQueueStatement(con);
     }
 
-    public void flushQueue(String sqlString) {
+    private void createQueueStatement(Connection con) throws Exception {
+
+        StringBuilder sBuilder = new StringBuilder("INSERT INTO blocks (blockID, x, y, z, world) VALUES ");
+        for (int i = 0; i < BlockQueue.QUEUE_SIZE; ++i)
+            sBuilder.append("(?, ?, ? , ?, ?),");
+
+        sBuilder.deleteCharAt(sBuilder.length() - 1);
+
+        queue = con.prepareStatement(sBuilder.toString());
+    }
+
+    public void flushQueue(Queue<QueuedBlock> tempQueue) {
 
         try {
-            Statement st = dbConnection.getConnection().createStatement();
-            st.executeUpdate(sqlString);
+            int index = 1;
+            QueuedBlock block = null;
+            while (!tempQueue.isEmpty()) {
+                block = tempQueue.poll();
+                queue.setInt(index++, block.getID());
+                queue.setInt(index++, block.getX());
+                queue.setInt(index++, block.getY());
+                queue.setInt(index++, block.getZ());
+                queue.setString(index++, block.getWorldName());
+            }
+
+            queue.executeUpdate();
         } catch (Exception e) {
             ConsoleUtils.printException(e, KrypteiaCore.NAME, "Can't flush queue to database!");
         }
@@ -77,7 +104,7 @@ public class DatabaseHandler extends AbstractMySQLHandler {
 
     public ArrayList<DataBlock> getDataBlocks(String worldName) {
 
-        ArrayList<DataBlock> result = new ArrayList<DataBlock>(1024 * 1024);
+        ArrayList<DataBlock> result = new ArrayList<DataBlock>(8192);
         try {
             getDataBlocks.setString(1, worldName);
 
@@ -101,5 +128,14 @@ public class DatabaseHandler extends AbstractMySQLHandler {
         }
 
         return result;
+    }
+
+    public void finishQueue(String sqlString) {
+        try {
+            Statement st = dbConnection.getConnection().createStatement();
+            st.executeUpdate(sqlString);
+        } catch (Exception e) {
+            ConsoleUtils.printException(e, KrypteiaCore.NAME, "Can't finish queue to database!");
+        }
     }
 }

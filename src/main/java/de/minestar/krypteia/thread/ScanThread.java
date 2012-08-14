@@ -74,6 +74,7 @@ public class ScanThread implements Runnable {
     @Override
     public void run() {
         if (curX == endX) {
+            KrypteiaCore.blockQueue.finishQueue();
             Bukkit.getScheduler().cancelTask(threadId);
             ConsoleUtils.printInfo(KrypteiaCore.NAME, "Scan finished");
         } else
