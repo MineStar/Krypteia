@@ -1,5 +1,8 @@
-name: Illuminati
-main: de.minestar.illuminati.IlluminatiCore
+name: Krypeia
+main: de.minestar.krypteia.core.KrypteiaCore
 version: ${pom.version}
-depend: [GroupManager, FalseBookCore, MineStarLibrary]
-load: STARTUP
+depend: [MineStarLibrary]
+commands:
+    scan:
+        description: Scannt eine Welt
+        usage: /scan
