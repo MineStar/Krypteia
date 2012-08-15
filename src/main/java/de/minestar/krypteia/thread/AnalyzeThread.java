@@ -56,7 +56,7 @@ public class AnalyzeThread implements Runnable {
                         if (o1.getY() == o2.getY()) {
                             return o1.getZ() - o2.getZ();
                         } else
-                            return o1.getY() - o2.getZ();
+                            return o1.getY() - o2.getY();
                     } else
                         return o1.getX() - o2.getX();
                 } else
@@ -88,10 +88,12 @@ public class AnalyzeThread implements Runnable {
     }
 
     private final static NumberFormat FORMAT = DecimalFormat.getPercentInstance();
+    private String curPercent = "";
+    private String oldPercent = "";
 
     private void analyzeData() {
         int tempRadius = radius * radius;
-        float percent = 0.0F;
+        double percent = 0.0;
         DataBlock block = null;
         for (int i = 0; i < data.length; ++i) {
             block = data[i];
@@ -99,8 +101,12 @@ public class AnalyzeThread implements Runnable {
                 if (block.isInRange(data[j], tempRadius))
                     block.addNeighbor();
             }
-            percent = (float) i / (float) data.length;
-            ConsoleUtils.printInfo(KrypteiaCore.NAME, "Analyze Thread Status = " + FORMAT.format(percent));
+            percent = (double) i / (double) data.length;
+            curPercent = FORMAT.format(percent);
+            if (!oldPercent.equals(curPercent)) {
+                ConsoleUtils.printInfo(KrypteiaCore.NAME, "Analyze Thread Status = " + curPercent);
+                oldPercent = curPercent;
+            }
         }
 
         ConsoleUtils.printInfo(KrypteiaCore.NAME, "Finished Analyzing!");
