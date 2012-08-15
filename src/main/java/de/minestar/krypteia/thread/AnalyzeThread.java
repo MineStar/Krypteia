@@ -37,11 +37,13 @@ import de.minestar.minestarlibrary.utils.ConsoleUtils;
 public class AnalyzeThread implements Runnable {
 
     private String worldName;
+    private int radius;
 
     private DataBlock[] data;
 
-    public AnalyzeThread(String worldName) {
+    public AnalyzeThread(String worldName, int radius) {
         this.worldName = worldName;
+        this.radius = radius;
     }
 
     private final static Comparator<DataBlock> COMPARATOR = new Comparator<DataBlock>() {
@@ -85,17 +87,16 @@ public class AnalyzeThread implements Runnable {
         ConsoleUtils.printInfo(KrypteiaCore.NAME, "Finished fetching data from database");
     }
 
-    private final static int RADIUS = 50;
-
     private final static NumberFormat FORMAT = DecimalFormat.getPercentInstance();
 
     private void analyzeData() {
+        int tempRadius = radius * radius;
         float percent = 0.0F;
         DataBlock block = null;
         for (int i = 0; i < data.length; ++i) {
             block = data[i];
             for (int j = i + 1; j < data.length; ++j) {
-                if (block.isInRange(data[j], RADIUS))
+                if (block.isInRange(data[j], tempRadius))
                     block.addNeighbor();
             }
             percent = (float) i / (float) data.length;

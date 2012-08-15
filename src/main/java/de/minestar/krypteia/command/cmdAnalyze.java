@@ -52,6 +52,15 @@ public class cmdAnalyze extends AbstractCommand {
             return;
         }
 
+        int radius = 0;
+        try {
+            radius = Integer.parseInt(args[1]);
+        } catch (Exception e) {
+            ConsoleUtils.printError(pluginName, args[1] + " ist keine Zahl!");
+            return;
+        }
+
+        
         if (!KrypteiaCore.dbHandler.hasData(worldName)) {
             ConsoleUtils.printError(pluginName, "Uber die Welt '" + worldName + "' liegen keine Daten vor!");
             return;
@@ -59,6 +68,6 @@ public class cmdAnalyze extends AbstractCommand {
 
         ConsoleUtils.printInfo(pluginName, "Start analyze of world '" + worldName + "'!");
 
-        Bukkit.getScheduler().scheduleAsyncDelayedTask(KrypteiaCore.INSTANCE, new AnalyzeThread(world.getName().toLowerCase()));
+        Bukkit.getScheduler().scheduleAsyncDelayedTask(KrypteiaCore.INSTANCE, new AnalyzeThread(world.getName().toLowerCase(), radius));
     }
 }

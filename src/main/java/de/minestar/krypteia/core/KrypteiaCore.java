@@ -41,7 +41,7 @@ public class KrypteiaCore extends AbstractCore {
         this.cmdList = new CommandList(NAME,
                     
                     new cmdScan(        "/scan",    "<World> <Size>",   "krypteia.command"),
-                    new cmdAnalyze(     "/analyze", "<World>",          "krypteia.command")
+                    new cmdAnalyze(     "/analyze", "<World> <Radius>", "krypteia.command")
                 );
 
         // @formatter:on
