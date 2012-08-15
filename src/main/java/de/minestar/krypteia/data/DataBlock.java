@@ -54,6 +54,10 @@ public class DataBlock {
         ++neighbors;
     }
 
+    public void addNeighbors(DataBlock other) {
+        this.neighbors += other.neighbors;
+    }
+
     public int getNeighbors() {
         return neighbors;
     }
