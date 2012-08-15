@@ -47,7 +47,7 @@ public class DataBlock {
     }
 
     public boolean isInRange(int x, int y, int z, int r) {
-        return r >= (Math.pow(this.x * x, 2) + Math.pow(this.y * y, 2) + Math.pow(this.z * z, 2));
+        return r >= (Math.pow(this.x - x, 2) + Math.pow(this.y - y, 2) + Math.pow(this.z - z, 2));
     }
 
     public void addNeighbor() {
