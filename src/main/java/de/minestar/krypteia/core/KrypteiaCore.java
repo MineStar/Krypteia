@@ -4,10 +4,11 @@ import java.io.File;
 
 import org.bukkit.scheduler.BukkitScheduler;
 
-import de.minestar.krypteia.command.cmdAnalyze;
-import de.minestar.krypteia.command.cmdScan;
+import de.minestar.krypteia.command.cmdKrypteia;
+import de.minestar.krypteia.command.cmdKrypteiaAnalyze;
+import de.minestar.krypteia.command.cmdKrypteiaScan;
 import de.minestar.krypteia.database.DatabaseHandler;
-import de.minestar.krypteia.thread.BlockQueue;
+import de.minestar.krypteia.thread.block.BlockQueue;
 import de.minestar.minestarlibrary.AbstractCore;
 import de.minestar.minestarlibrary.commands.CommandList;
 
@@ -40,9 +41,11 @@ public class KrypteiaCore extends AbstractCore {
         // @formatter:off
         this.cmdList = new CommandList(NAME,
                     
-                    new cmdScan(        "/scan",    "<World> <Size>",   "krypteia.command"),
-                    new cmdAnalyze(     "/analyze", "<World> <Radius>", "krypteia.command")
-                );
+                new cmdKrypteia(NAME,   "/krypt",   "",     "krypteia.command", 
+                    new cmdKrypteiaScan(            "scan",    "<World> <Size> <Type>",   "krypteia.command.scan"),
+                    new cmdKrypteiaAnalyze(         "analyze", "<World> <Radius> <Type>", "krypteia.command.analyze")
+                )
+        );
 
         // @formatter:on
         return true;

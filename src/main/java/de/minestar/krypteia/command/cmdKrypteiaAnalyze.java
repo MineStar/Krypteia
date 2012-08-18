@@ -24,14 +24,15 @@ import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.entity.Player;
 
 import de.minestar.krypteia.core.KrypteiaCore;
-import de.minestar.krypteia.thread.ScanThread;
+import de.minestar.krypteia.data.ScanType;
+import de.minestar.krypteia.thread.block.AnalyzeThread;
 import de.minestar.minestarlibrary.commands.AbstractCommand;
 import de.minestar.minestarlibrary.utils.ConsoleUtils;
 import de.minestar.minestarlibrary.utils.PlayerUtils;
 
-public class cmdScan extends AbstractCommand {
+public class cmdKrypteiaAnalyze extends AbstractCommand {
 
-    public cmdScan(String syntax, String arguments, String node) {
+    public cmdKrypteiaAnalyze(String syntax, String arguments, String node) {
         super(KrypteiaCore.NAME, syntax, arguments, node);
     }
 
@@ -52,18 +53,27 @@ public class cmdScan extends AbstractCommand {
             return;
         }
 
-        int size = 0;
+        int radius = 0;
         try {
-            size = Integer.parseInt(args[1]);
+            radius = Integer.parseInt(args[1]);
         } catch (Exception e) {
             ConsoleUtils.printError(pluginName, args[1] + " ist keine Zahl!");
             return;
         }
 
-        ConsoleUtils.printInfo(pluginName, "Start scan");
+        ScanType type = ScanType.valueOf(args[2]);
+        if (type == null) {
+            ConsoleUtils.printError(pluginName, "Unbekannter ScanType '" + args[2] + "'!");
+            return;
+        }
 
-        ScanThread thread = new ScanThread(world, size);
-        int id = Bukkit.getScheduler().scheduleSyncRepeatingTask(KrypteiaCore.INSTANCE, thread, 0L, 20L);
-        thread.setThreadId(id);
+        if (!KrypteiaCore.dbHandler.hasBlockData(worldName)) {
+            ConsoleUtils.printError(pluginName, "Uber die Welt '" + worldName + "' liegen keine Daten vor!");
+            return;
+        }
+
+        ConsoleUtils.printInfo(pluginName, "Start analyze of world '" + worldName + "'!");
+
+        Bukkit.getScheduler().scheduleAsyncDelayedTask(KrypteiaCore.INSTANCE, new AnalyzeThread(world.getName().toLowerCase(), radius));
     }
 }

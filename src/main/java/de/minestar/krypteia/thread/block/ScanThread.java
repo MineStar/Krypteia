@@ -16,7 +16,7 @@
  * along with Krypteia.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package de.minestar.krypteia.thread;
+package de.minestar.krypteia.thread.block;
 
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
@@ -90,7 +90,7 @@ public class ScanThread implements Runnable {
     private void unloadChunks() {
         for (Chunk c : chunksToUnload)
             c.unload(false, false);
-        
+
         chunksToUnload.clear();
     }
 

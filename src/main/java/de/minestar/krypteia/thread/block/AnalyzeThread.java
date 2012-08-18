@@ -16,7 +16,7 @@
  * along with Krypteia.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package de.minestar.krypteia.thread;
+package de.minestar.krypteia.thread.block;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -31,7 +31,7 @@ import java.util.Comparator;
 import java.util.Date;
 
 import de.minestar.krypteia.core.KrypteiaCore;
-import de.minestar.krypteia.data.DataBlock;
+import de.minestar.krypteia.data.block.DataBlock;
 import de.minestar.minestarlibrary.utils.ConsoleUtils;
 
 public class AnalyzeThread implements Runnable {
@@ -97,6 +97,7 @@ public class AnalyzeThread implements Runnable {
         oldPercent = "";
         ConsoleUtils.printInfo(KrypteiaCore.NAME, "Analyze Thread: Calculate neighbors finished!");
     }
+
     private final static Comparator<DataBlock> COMPARATOR = new Comparator<DataBlock>() {
 
         @Override

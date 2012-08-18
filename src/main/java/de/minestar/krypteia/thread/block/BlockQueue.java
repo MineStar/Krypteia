@@ -16,14 +16,14 @@
  * along with Krypteia.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package de.minestar.krypteia.thread;
+package de.minestar.krypteia.thread.block;
 
 import java.util.LinkedList;
 import java.util.Queue;
 import java.util.concurrent.LinkedBlockingDeque;
 
 import de.minestar.krypteia.core.KrypteiaCore;
-import de.minestar.krypteia.data.QueuedBlock;
+import de.minestar.krypteia.data.block.QueuedBlock;
 
 public class BlockQueue implements Runnable {
 
@@ -48,13 +48,13 @@ public class BlockQueue implements Runnable {
             for (int i = 0; i < QUEUE_SIZE; ++i)
                 tempQueue.offer(queue.poll());
 
-            KrypteiaCore.dbHandler.flushQueue(tempQueue);
+            KrypteiaCore.dbHandler.flushBlockQueue(tempQueue);
         }
     }
 
     public void finishQueue() {
         if (!queue.isEmpty())
-            KrypteiaCore.dbHandler.finishQueue(createQueueStatement());
+            KrypteiaCore.dbHandler.finishBlockQueue(createQueueStatement());
     }
 
     private String createQueueStatement() {

@@ -27,18 +27,14 @@ import java.util.ArrayList;
 import java.util.Queue;
 
 import de.minestar.krypteia.core.KrypteiaCore;
-import de.minestar.krypteia.data.DataBlock;
-import de.minestar.krypteia.data.QueuedBlock;
-import de.minestar.krypteia.thread.BlockQueue;
+import de.minestar.krypteia.data.block.DataBlock;
+import de.minestar.krypteia.data.block.QueuedBlock;
+import de.minestar.krypteia.thread.block.BlockQueue;
 import de.minestar.minestarlibrary.database.AbstractMySQLHandler;
 import de.minestar.minestarlibrary.database.DatabaseUtils;
 import de.minestar.minestarlibrary.utils.ConsoleUtils;
 
 public class DatabaseHandler extends AbstractMySQLHandler {
-
-    private PreparedStatement hasData;
-    private PreparedStatement getDataBlocks;
-    private PreparedStatement queue;
 
     public DatabaseHandler(String pluginName, File SQLConfigFile) {
         super(pluginName, SQLConfigFile);
@@ -52,13 +48,19 @@ public class DatabaseHandler extends AbstractMySQLHandler {
     @Override
     protected void createStatements(String pluginName, Connection con) throws Exception {
 
-        hasData = con.prepareStatement("SELECT 1 FROM blocks WHERE world = ?");
+        // BLOCK
+        hasBlockData = con.prepareStatement("SELECT 1 FROM blocks WHERE world = ?");
         getDataBlocks = con.prepareStatement("SELECT blockId, x, y, z FROM blocks WHERE world = ? ORDER BY blockId, y, x, z");
 
-        createQueueStatement(con);
+        createBlockQueueStatement(con);
     }
 
-    private void createQueueStatement(Connection con) throws Exception {
+    // BLOCK
+    private PreparedStatement hasBlockData;
+    private PreparedStatement getDataBlocks;
+    private PreparedStatement blockQueueStatement;
+
+    private void createBlockQueueStatement(Connection con) throws Exception {
 
         StringBuilder sBuilder = new StringBuilder("INSERT INTO blocks (blockID, x, y, z, world) VALUES ");
         for (int i = 0; i < BlockQueue.QUEUE_SIZE; ++i)
@@ -66,38 +68,38 @@ public class DatabaseHandler extends AbstractMySQLHandler {
 
         sBuilder.deleteCharAt(sBuilder.length() - 1);
 
-        queue = con.prepareStatement(sBuilder.toString());
+        blockQueueStatement = con.prepareStatement(sBuilder.toString());
     }
 
-    public void flushQueue(Queue<QueuedBlock> tempQueue) {
+    public void flushBlockQueue(Queue<QueuedBlock> tempQueue) {
 
         try {
             int index = 1;
             QueuedBlock block = null;
             while (!tempQueue.isEmpty()) {
                 block = tempQueue.poll();
-                queue.setInt(index++, block.getID());
-                queue.setInt(index++, block.getX());
-                queue.setInt(index++, block.getY());
-                queue.setInt(index++, block.getZ());
-                queue.setString(index++, block.getWorldName());
+                blockQueueStatement.setInt(index++, block.getID());
+                blockQueueStatement.setInt(index++, block.getX());
+                blockQueueStatement.setInt(index++, block.getY());
+                blockQueueStatement.setInt(index++, block.getZ());
+                blockQueueStatement.setString(index++, block.getWorldName());
             }
             tempQueue.clear();
             tempQueue = null;
             block = null;
-            queue.executeUpdate();
+            blockQueueStatement.executeUpdate();
         } catch (Exception e) {
             ConsoleUtils.printException(e, KrypteiaCore.NAME, "Can't flush queue to database!");
         }
     }
 
-    public boolean hasData(String worldName) {
+    public boolean hasBlockData(String worldName) {
 
         try {
 
-            hasData.setString(1, worldName);
+            hasBlockData.setString(1, worldName);
 
-            return hasData.executeQuery().next();
+            return hasBlockData.executeQuery().next();
         } catch (Exception e) {
             ConsoleUtils.printException(e, KrypteiaCore.NAME, "Can't check if there is data for world '" + worldName + "'!");
             return false;
@@ -132,7 +134,7 @@ public class DatabaseHandler extends AbstractMySQLHandler {
         return result;
     }
 
-    public void finishQueue(String sqlString) {
+    public void finishBlockQueue(String sqlString) {
         try {
             Statement st = dbConnection.getConnection().createStatement();
             st.executeUpdate(sqlString);

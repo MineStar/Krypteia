@@ -16,7 +16,7 @@
  * along with Krypteia.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package de.minestar.krypteia.data;
+package de.minestar.krypteia.data.block;
 
 import de.minestar.minestarlibrary.database.DatabaseUtils;
 
