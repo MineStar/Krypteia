@@ -37,6 +37,7 @@ public class MobScanThread extends ScanThread {
 
     private Entity[] entities;
     private Location loc;
+    private short typeID;
 
     @Override
     protected void scanChunk(Chunk chunk, String worldName) {
@@ -46,9 +47,10 @@ public class MobScanThread extends ScanThread {
             return;
 
         for (Entity mob : entities) {
-            if (isInterestingID(mob.getType().getTypeId())) {
+            typeID = mob.getType().getTypeId();
+            if (isInterestingID(typeID)) {
                 loc = mob.getLocation();
-                KrypteiaCore.queue.addData(loc.getBlockX() + (chunk.getX() << 4), loc.getBlockY(), loc.getBlockZ() + (chunk.getZ() << 4), worldName, mob.getEntityId());
+                KrypteiaCore.queue.addData(loc.getBlockX() + (chunk.getX() << 4), loc.getBlockY(), loc.getBlockZ() + (chunk.getZ() << 4), worldName, typeID);
             }
         }
     }
