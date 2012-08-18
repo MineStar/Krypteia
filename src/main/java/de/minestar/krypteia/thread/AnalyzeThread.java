@@ -178,13 +178,13 @@ public class AnalyzeThread implements Runnable {
         ConsoleUtils.printInfo(KrypteiaCore.NAME, "Analyze Thread: Finished summarizing neighbors!");
     }
 
-    private final static DateFormat DATE_FORMAT = new SimpleDateFormat("HH_mm_ss__dd_MM_yyyy");
+    private final static DateFormat DATE_FORMAT = new SimpleDateFormat("HH_mm__dd_MM_yyyy");
 
     private void writeData() {
         try {
 
             ConsoleUtils.printInfo(KrypteiaCore.NAME, "Start writing analyzed data to output...!");
-            BufferedWriter bWriter = new BufferedWriter(new FileWriter(new File(KrypteiaCore.INSTANCE.getDataFolder(), type.getTypeName() + "_" + DATE_FORMAT.format(new Date()) + "_output.txt")));
+            BufferedWriter bWriter = new BufferedWriter(new FileWriter(new File(KrypteiaCore.INSTANCE.getDataFolder(), this.worldName + "_" + type.getTypeName() + "_" + DATE_FORMAT.format(new Date()) + "_output.txt")));
             ScannedData block = null;
             for (int i = 0; i < data.length; ++i) {
                 block = data[i];
