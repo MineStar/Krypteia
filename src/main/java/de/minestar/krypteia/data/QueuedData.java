@@ -16,24 +16,24 @@
  * along with Krypteia.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package de.minestar.krypteia.data.block;
+package de.minestar.krypteia.data;
 
 import de.minestar.minestarlibrary.database.DatabaseUtils;
 
-public class QueuedBlock {
+public class QueuedData {
 
     private final int x;
     private final int y;
     private final int z;
     private final String worldName;
-    private final int blockID;
+    private final int ID;
 
-    public QueuedBlock(int x, int y, int z, String worldName, int blockID) {
+    public QueuedData(int x, int y, int z, String worldName, int blockID) {
         this.x = x;
         this.y = y;
         this.z = z;
         this.worldName = worldName;
-        this.blockID = blockID;
+        this.ID = blockID;
     }
 
     public int getX() {
@@ -53,14 +53,14 @@ public class QueuedBlock {
     }
 
     public int getID() {
-        return blockID;
+        return ID;
     }
 
     public String convertToString() {
         StringBuilder sBuilder = new StringBuilder();
         sBuilder.append('(');
 
-        sBuilder.append(blockID);
+        sBuilder.append(ID);
         sBuilder.append(',');
         sBuilder.append(x);
         sBuilder.append(',');

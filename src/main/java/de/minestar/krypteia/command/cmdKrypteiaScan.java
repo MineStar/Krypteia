@@ -22,10 +22,15 @@ import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.entity.Player;
+import org.bukkit.scheduler.BukkitScheduler;
 
 import de.minestar.krypteia.core.KrypteiaCore;
 import de.minestar.krypteia.data.ScanType;
-import de.minestar.krypteia.thread.block.ScanThread;
+import de.minestar.krypteia.thread.queues.BlockQueue;
+import de.minestar.krypteia.thread.queues.MobQueue;
+import de.minestar.krypteia.thread.scan.BlockScanThread;
+import de.minestar.krypteia.thread.scan.MobScanThread;
+import de.minestar.krypteia.thread.scan.ScanThread;
 import de.minestar.minestarlibrary.commands.AbstractCommand;
 import de.minestar.minestarlibrary.utils.ConsoleUtils;
 import de.minestar.minestarlibrary.utils.PlayerUtils;
@@ -61,16 +66,30 @@ public class cmdKrypteiaScan extends AbstractCommand {
             return;
         }
 
-        ScanType type = ScanType.valueOf(args[2]);
+        ScanType type = ScanType.getType(args[2]);
         if (type == null) {
             ConsoleUtils.printError(pluginName, "Unbekannter ScanType '" + args[2] + "'!");
             return;
         }
 
-        ConsoleUtils.printInfo(pluginName, "Start scan");
+        ScanThread thread = null;
+        switch (type) {
+            case BLOCK :
+                KrypteiaCore.queue = new BlockQueue();
+                thread = new BlockScanThread(world, size);
+                break;
+            case MOB :
+                KrypteiaCore.queue = new MobQueue();
+                thread = new MobScanThread(world, size);
+                break;
+        }
 
-        ScanThread thread = new ScanThread(world, size);
-        int id = Bukkit.getScheduler().scheduleSyncRepeatingTask(KrypteiaCore.INSTANCE, thread, 0L, 20L);
+        BukkitScheduler scheduler = Bukkit.getScheduler();
+        scheduler.scheduleAsyncRepeatingTask(KrypteiaCore.INSTANCE, KrypteiaCore.queue, 0L, 20L * 5L);
+        int id = scheduler.scheduleSyncRepeatingTask(KrypteiaCore.INSTANCE, thread, 5L, 20L);
         thread.setThreadId(id);
+
+        ConsoleUtils.printInfo(pluginName, "Start scanning '" + type.getTypeName() + "' in world '" + world.getName() + "' with size " + size);
+
     }
 }

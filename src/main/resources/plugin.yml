@@ -3,9 +3,6 @@ main: de.minestar.krypteia.core.KrypteiaCore
 version: ${pom.version}
 depend: [MineStarLibrary]
 commands:
-    scan:
-        description: Scannt eine Welt
+    krypt:
+        description: Super Befehl fuer Krypteia
         usage: /scan
-    analyze:
-        description: Analysiert Daten einer Welt
-        analyze: /scan

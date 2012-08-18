@@ -16,26 +16,22 @@
  * along with Krypteia.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package de.minestar.krypteia.thread.block;
+package de.minestar.krypteia.thread.scan;
 
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
-import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Set;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
-import org.bukkit.ChunkSnapshot;
 import org.bukkit.Location;
-import org.bukkit.Material;
 import org.bukkit.World;
 
 import de.minestar.krypteia.core.KrypteiaCore;
 import de.minestar.minestarlibrary.utils.ConsoleUtils;
 
-public class ScanThread implements Runnable {
+public abstract class ScanThread implements Runnable {
 
     private World world;
 
@@ -78,7 +74,7 @@ public class ScanThread implements Runnable {
     @Override
     public void run() {
         if (curX == endX) {
-            KrypteiaCore.blockQueue.finishQueue();
+            KrypteiaCore.queue.finishQueue();
             Bukkit.getScheduler().cancelTask(threadId);
             ConsoleUtils.printInfo(KrypteiaCore.NAME, "Scan finished");
         } else {
@@ -98,15 +94,13 @@ public class ScanThread implements Runnable {
 
     private void scanWorld() {
 
-        ChunkSnapshot snapShot = null;
         Chunk chunk = null;
+        String worldName = world.getName().toLowerCase();
         for (int z = startZ; z <= endZ; ++z) {
             curZ = z;
             chunk = world.getChunkAt(curX, curZ);
             if (chunk != null) {
-                snapShot = chunk.getChunkSnapshot();
-                if (snapShot != null)
-                    scanChunk(snapShot, world.getName().toLowerCase());
+                scanChunk(chunk, worldName);
                 chunksToUnload.add(chunk);
             }
 
@@ -125,32 +119,9 @@ public class ScanThread implements Runnable {
         return x * z;
     }
 
-    private void scanChunk(ChunkSnapshot snapShot, String worldName) {
-        int blockID = 0;
-        for (int x = 0; x < 16; ++x) {
-            for (int z = 0; z < 16; ++z) {
-                for (int y = 0; y < 255; ++y) {
+    protected abstract void scanChunk(Chunk chunk, String worldName);
 
-                    blockID = snapShot.getBlockTypeId(x, y, z);
-                    if (interestingBlockIDs.contains(blockID))
-                        KrypteiaCore.blockQueue.addBlock(x + (snapShot.getX() << 4), y, z + (snapShot.getZ() << 4), worldName, blockID);
-                }
-            }
-        }
-
-    }
-
-    private static Set<Integer> interestingBlockIDs;
-
-    static {
-        interestingBlockIDs = new HashSet<Integer>();
-        interestingBlockIDs.add(Material.CROPS.getId());
-        interestingBlockIDs.add(Material.CACTUS.getId());
-        interestingBlockIDs.add(Material.PUMPKIN_STEM.getId());
-        interestingBlockIDs.add(Material.SUGAR_CANE_BLOCK.getId());
-        interestingBlockIDs.add(Material.MELON_STEM.getId());
-        interestingBlockIDs.add(Material.COCOA.getId());
-    }
+    protected abstract boolean isInterestingID(int id);
 
     public void setThreadId(int id) {
         this.threadId = id;

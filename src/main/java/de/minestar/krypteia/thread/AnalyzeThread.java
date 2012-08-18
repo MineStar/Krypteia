@@ -16,7 +16,7 @@
  * along with Krypteia.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package de.minestar.krypteia.thread.block;
+package de.minestar.krypteia.thread;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -31,25 +31,28 @@ import java.util.Comparator;
 import java.util.Date;
 
 import de.minestar.krypteia.core.KrypteiaCore;
-import de.minestar.krypteia.data.block.DataBlock;
+import de.minestar.krypteia.data.ScanType;
+import de.minestar.krypteia.data.ScannedData;
 import de.minestar.minestarlibrary.utils.ConsoleUtils;
 
 public class AnalyzeThread implements Runnable {
 
     private String worldName;
     private int radius;
+    private ScanType type;
 
-    private DataBlock[] data;
+    private ScannedData[] data;
 
-    public AnalyzeThread(String worldName, int radius) {
+    public AnalyzeThread(String worldName, int radius, ScanType type) {
         this.worldName = worldName;
         this.radius = radius;
+        this.type = type;
     }
 
     @Override
     public void run() {
         if (data == null)
-            loadDataBlocks();
+            loadData();
         if (data != null)
             calculateNeighbors();
         else
@@ -62,10 +65,18 @@ public class AnalyzeThread implements Runnable {
         writeData();
     }
 
-    private void loadDataBlocks() {
+    private void loadData() {
         ConsoleUtils.printInfo(KrypteiaCore.NAME, "Analyze Thread: Fetch data from database...");
-        ArrayList<DataBlock> temp = KrypteiaCore.dbHandler.getDataBlocks(worldName);
-        data = (DataBlock[]) temp.toArray(new DataBlock[temp.size()]);
+        ArrayList<ScannedData> temp = null;
+        switch (type) {
+            case BLOCK :
+                temp = KrypteiaCore.dbHandler.getScannedDataBlock(worldName);
+                break;
+            case MOB :
+                temp = KrypteiaCore.dbHandler.getScannedDataMobs(worldName);
+                break;
+        }
+        data = (ScannedData[]) temp.toArray(new ScannedData[temp.size()]);
         ConsoleUtils.printInfo(KrypteiaCore.NAME, "Analyze Thread: Finished fetching data from database!");
     }
 
@@ -76,7 +87,7 @@ public class AnalyzeThread implements Runnable {
     private void calculateNeighbors() {
         int tempRadius = radius * radius;
         double percent = 0.0;
-        DataBlock block = null;
+        ScannedData block = null;
 
         ConsoleUtils.printInfo(KrypteiaCore.NAME, "Analyze Thread: Start Calculating neighbors...");
         for (int i = 0; i < data.length; ++i) {
@@ -98,12 +109,12 @@ public class AnalyzeThread implements Runnable {
         ConsoleUtils.printInfo(KrypteiaCore.NAME, "Analyze Thread: Calculate neighbors finished!");
     }
 
-    private final static Comparator<DataBlock> COMPARATOR = new Comparator<DataBlock>() {
+    private final static Comparator<ScannedData> COMPARATOR = new Comparator<ScannedData>() {
 
         @Override
-        public int compare(DataBlock o1, DataBlock o2) {
+        public int compare(ScannedData o1, ScannedData o2) {
             if (o1.getNeighbors() == o2.getNeighbors()) {
-                if (o1.getBlockID() == o2.getBlockID()) {
+                if (o1.getID() == o2.getID()) {
                     if (o1.getX() == o2.getX()) {
                         if (o1.getY() == o2.getY()) {
                             return o1.getZ() - o2.getZ();
@@ -112,7 +123,7 @@ public class AnalyzeThread implements Runnable {
                     } else
                         return o1.getX() - o2.getX();
                 } else
-                    return o1.getBlockID() - o2.getBlockID();
+                    return o1.getID() - o2.getID();
             } else
                 return o2.getNeighbors() - o1.getNeighbors();
         }
@@ -126,7 +137,7 @@ public class AnalyzeThread implements Runnable {
 
     private void summarizeData() {
         ConsoleUtils.printInfo(KrypteiaCore.NAME, "Analyze Thread: Start summarizing neighbors...");
-        DataBlock block;
+        ScannedData block;
         int tempRadius = radius * radius;
         double percent = 0.0;
 
@@ -155,7 +166,7 @@ public class AnalyzeThread implements Runnable {
             if (data[i] != null)
                 ++count;
 
-        DataBlock[] tempData = new DataBlock[count];
+        ScannedData[] tempData = new ScannedData[count];
         for (int i = 0, j = 0; i < data.length; ++i)
             if (data[i] != null)
                 tempData[j++] = data[i];
@@ -173,8 +184,8 @@ public class AnalyzeThread implements Runnable {
         try {
 
             ConsoleUtils.printInfo(KrypteiaCore.NAME, "Start writing analyzed data to output...!");
-            BufferedWriter bWriter = new BufferedWriter(new FileWriter(new File(KrypteiaCore.INSTANCE.getDataFolder(), DATE_FORMAT.format(new Date()) + "_output.txt")));
-            DataBlock block = null;
+            BufferedWriter bWriter = new BufferedWriter(new FileWriter(new File(KrypteiaCore.INSTANCE.getDataFolder(), type.getTypeName() + "_" + DATE_FORMAT.format(new Date()) + "_output.txt")));
+            ScannedData block = null;
             for (int i = 0; i < data.length; ++i) {
                 block = data[i];
                 if (block == null)

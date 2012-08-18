@@ -25,7 +25,7 @@ import org.bukkit.entity.Player;
 
 import de.minestar.krypteia.core.KrypteiaCore;
 import de.minestar.krypteia.data.ScanType;
-import de.minestar.krypteia.thread.block.AnalyzeThread;
+import de.minestar.krypteia.thread.AnalyzeThread;
 import de.minestar.minestarlibrary.commands.AbstractCommand;
 import de.minestar.minestarlibrary.utils.ConsoleUtils;
 import de.minestar.minestarlibrary.utils.PlayerUtils;
@@ -61,19 +61,29 @@ public class cmdKrypteiaAnalyze extends AbstractCommand {
             return;
         }
 
-        ScanType type = ScanType.valueOf(args[2]);
+        ScanType type = ScanType.getType(args[2]);
         if (type == null) {
             ConsoleUtils.printError(pluginName, "Unbekannter ScanType '" + args[2] + "'!");
             return;
         }
 
-        if (!KrypteiaCore.dbHandler.hasBlockData(worldName)) {
-            ConsoleUtils.printError(pluginName, "Uber die Welt '" + worldName + "' liegen keine Daten vor!");
-            return;
+        switch (type) {
+            case BLOCK :
+                if (!KrypteiaCore.dbHandler.hasBlockData(worldName)) {
+                    ConsoleUtils.printError(pluginName, "Uber die Welt '" + worldName + "' liegen keine Daten vor!");
+                    return;
+                }
+                break;
+            case MOB :
+                if (!KrypteiaCore.dbHandler.hasMobData(worldName)) {
+                    ConsoleUtils.printError(pluginName, "Uber die Welt '" + worldName + "' liegen keine Daten vor!");
+                    return;
+                }
+                break;
         }
 
-        ConsoleUtils.printInfo(pluginName, "Start analyze of world '" + worldName + "'!");
+        Bukkit.getScheduler().scheduleAsyncDelayedTask(KrypteiaCore.INSTANCE, new AnalyzeThread(world.getName().toLowerCase(), radius, type));
 
-        Bukkit.getScheduler().scheduleAsyncDelayedTask(KrypteiaCore.INSTANCE, new AnalyzeThread(world.getName().toLowerCase(), radius));
+        ConsoleUtils.printInfo(pluginName, "Start analyzing '" + type.getTypeName() + "' of world '" + worldName + "' with radius " + radius + "!");
     }
 }

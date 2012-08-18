@@ -34,6 +34,10 @@ public enum ScanType {
         this.typeName = typeName;
     }
 
+    public String getTypeName() {
+        return typeName;
+    }
+
     private static Map<String, ScanType> mapByName = new HashMap<String, ScanType>();
 
     static {

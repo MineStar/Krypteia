@@ -16,49 +16,33 @@
  * along with Krypteia.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package de.minestar.krypteia.thread.block;
+package de.minestar.krypteia.thread.queues;
 
-import java.util.LinkedList;
 import java.util.Queue;
-import java.util.concurrent.LinkedBlockingDeque;
 
 import de.minestar.krypteia.core.KrypteiaCore;
-import de.minestar.krypteia.data.block.QueuedBlock;
+import de.minestar.krypteia.data.QueuedData;
 
-public class BlockQueue implements Runnable {
+public class BlockQueue extends DatabaseQueue {
 
     public final static int QUEUE_SIZE = 256;
 
-    private Queue<QueuedBlock> queue = new LinkedBlockingDeque<QueuedBlock>();
-
-    public synchronized void addBlock(int x, int y, int z, String worldName, int blockId) {
-        queue.add(new QueuedBlock(x, y, z, worldName, blockId));
+    public BlockQueue() {
+        super(QUEUE_SIZE);
     }
 
     @Override
-    public void run() {
-        if (queue.size() >= QUEUE_SIZE)
-            flushQueue();
-
+    protected void flushQueueExecute(Queue<QueuedData> queue) {
+        KrypteiaCore.dbHandler.flushBlockQueue(queue);
     }
 
-    public void flushQueue() {
-        if (!queue.isEmpty()) {
-            Queue<QueuedBlock> tempQueue = new LinkedList<QueuedBlock>();
-            for (int i = 0; i < QUEUE_SIZE; ++i)
-                tempQueue.offer(queue.poll());
-
-            KrypteiaCore.dbHandler.flushBlockQueue(tempQueue);
-        }
+    @Override
+    protected void finishQueueExecute() {
+        KrypteiaCore.dbHandler.finishBlockQueue(createQueueStatement());
     }
 
-    public void finishQueue() {
-        if (!queue.isEmpty())
-            KrypteiaCore.dbHandler.finishBlockQueue(createQueueStatement());
-    }
-
-    private String createQueueStatement() {
-
+    @Override
+    protected String createQueueStatement() {
         StringBuilder sBuilder = new StringBuilder("INSERT INTO blocks (blockID, x, y, z, world) VALUES ");
         while (!queue.isEmpty()) {
             sBuilder.append(queue.poll().convertToString());
