@@ -21,16 +21,14 @@ package de.minestar.krypteia.data;
 public class ScannedData {
 
     private int x, y, z;
-    private String worldName;
     private int ID;
 
     private int neighbors = 0;
 
-    public ScannedData(int x, int y, int z, String worldName, int ID) {
+    public ScannedData(int x, int y, int z, int ID) {
         this.x = x;
         this.y = y;
         this.z = z;
-        this.worldName = worldName;
         this.ID = ID;
     }
 
@@ -74,10 +72,6 @@ public class ScannedData {
         return z;
     }
 
-    public String getWorldName() {
-        return worldName;
-    }
-
     public int getID() {
         return ID;
     }
@@ -88,16 +82,14 @@ public class ScannedData {
 
         sBuilder.append("Neighbors=");
         sBuilder.append(neighbors);
-        sBuilder.append(", ID=");
+        sBuilder.append("\tID=");
         sBuilder.append(ID);
-        sBuilder.append(", X=");
+        sBuilder.append("\tX=");
         sBuilder.append(x);
-        sBuilder.append(", Y=");
+        sBuilder.append("\tY=");
         sBuilder.append(y);
-        sBuilder.append(", Z=");
+        sBuilder.append("\tZ=");
         sBuilder.append(z);
-        sBuilder.append(", World=");
-        sBuilder.append(worldName);
 
         return sBuilder.toString();
     }

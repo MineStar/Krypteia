@@ -29,8 +29,10 @@ public class KrypteiaCore extends AbstractCore {
     protected boolean createManager() {
 
         dbHandler = new DatabaseHandler(NAME, new File(getDataFolder(), "sqlconfig.yml"));
+        if (dbHandler == null || !dbHandler.hasConnection())
+            return false;
 
-        return dbHandler != null && dbHandler.hasConnection();
+        return true;
     }
 
     @Override
@@ -40,15 +42,14 @@ public class KrypteiaCore extends AbstractCore {
         this.cmdList = new CommandList(NAME,
                     
                 new cmdKrypteia(NAME,   "/krypt",   "",     "krypteia.command", 
-                    new cmdKrypteiaScan(            "scan",    "<World> <Size> <Type>",   "krypteia.command.scan"),
-                    new cmdKrypteiaAnalyze(         "analyze", "<World> <Radius> <Type>", "krypteia.command.analyze")
+                    new cmdKrypteiaScan(            "scan",     "<World> <Size> <Type>",    "krypteia.command.scan"),
+                    new cmdKrypteiaAnalyze(         "analyze",  "<World> <Radius> <Type>",  "krypteia.command.analyze")
                 )
         );
 
         // @formatter:on
         return true;
     }
-
     @Override
     protected boolean commonDisable() {
         if (queue != null)

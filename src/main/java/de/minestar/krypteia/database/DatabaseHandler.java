@@ -130,7 +130,7 @@ public class DatabaseHandler extends AbstractMySQLHandler {
                 y = rs.getInt(3);
                 z = rs.getInt(4);
 
-                result.add(new ScannedData(x, y, z, worldName, blockID));
+                result.add(new ScannedData(x, y, z, blockID));
             }
         } catch (Exception e) {
             ConsoleUtils.printException(e, KrypteiaCore.NAME, "Can't fetch data blocks for world '" + worldName + "'!");
@@ -218,7 +218,7 @@ public class DatabaseHandler extends AbstractMySQLHandler {
                 y = rs.getInt(3);
                 z = rs.getInt(4);
 
-                result.add(new ScannedData(x, y, z, worldName, blockID));
+                result.add(new ScannedData(x, y, z, blockID));
             }
         } catch (Exception e) {
             ConsoleUtils.printException(e, KrypteiaCore.NAME, "Can't fetch data blocks for world '" + worldName + "'!");
