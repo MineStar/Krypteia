@@ -184,7 +184,7 @@ public class AnalyzeThread implements Runnable {
         try {
 
             ConsoleUtils.printInfo(KrypteiaCore.NAME, "Start writing analyzed data to output...!");
-            BufferedWriter bWriter = new BufferedWriter(new FileWriter(new File(KrypteiaCore.INSTANCE.getDataFolder(), this.worldName + "_" + type.getTypeName() + "_" + DATE_FORMAT.format(new Date()) + "_output.txt")));
+            BufferedWriter bWriter = new BufferedWriter(new FileWriter(new File(KrypteiaCore.INSTANCE.getDataFolder(), this.worldName + "_" + type.getTypeName() + "_" + DATE_FORMAT.format(new Date()) + ".txt")));
             ScannedData block = null;
             for (int i = 0; i < data.length; ++i) {
                 block = data[i];
