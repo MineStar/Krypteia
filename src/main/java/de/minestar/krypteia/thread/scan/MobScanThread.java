@@ -50,7 +50,7 @@ public class MobScanThread extends ScanThread {
             typeID = mob.getType().getTypeId();
             if (isInterestingID(typeID)) {
                 loc = mob.getLocation();
-                KrypteiaCore.queue.addData(loc.getBlockX() + (chunk.getX() << 4), loc.getBlockY(), loc.getBlockZ() + (chunk.getZ() << 4), worldName, typeID);
+                KrypteiaCore.queue.addData(loc.getBlockX(), loc.getBlockY(), loc.getBlockZ(), worldName, typeID);
             }
         }
     }
